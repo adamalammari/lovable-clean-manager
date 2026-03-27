@@ -7,6 +7,7 @@ import {
   XCircle,
   RotateCcw,
   Sparkles,
+  FileText,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -32,6 +33,7 @@ const mainItems = [
 
 const reportItems = [
   { title: "تقارير المبيعات", url: "/reports", icon: BarChart3 },
+  { title: "الفواتير", url: "/invoices", icon: FileText },
   { title: "الإلغاءات", url: "/cancellations", icon: XCircle },
   { title: "المرتجعات", url: "/returns", icon: RotateCcw },
 ];
