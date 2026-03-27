@@ -33,6 +33,7 @@ const mainItems = [
 
 const reportItems = [
   { title: "تقارير المبيعات", url: "/reports", icon: BarChart3 },
+  { title: "الفواتير", url: "/invoices", icon: FileText },
   { title: "الإلغاءات", url: "/cancellations", icon: XCircle },
   { title: "المرتجعات", url: "/returns", icon: RotateCcw },
 ];
