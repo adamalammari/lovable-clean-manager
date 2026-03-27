@@ -11,6 +11,7 @@ import Bookings from "./pages/Bookings";
 import Reports from "./pages/Reports";
 import Cancellations from "./pages/Cancellations";
 import Returns from "./pages/Returns";
+import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
