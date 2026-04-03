@@ -27,6 +27,7 @@ import {
 const mainItems = [
   { title: "لوحة التحكم", url: "/", icon: LayoutDashboard },
   { title: "الطلبات", url: "/orders", icon: ClipboardList },
+  { title: "العمال", url: "/workers", icon: Users },
   { title: "جدولة العمال", url: "/scheduling", icon: CalendarCheck },
   { title: "الحجوزات", url: "/bookings", icon: CalendarCheck },
 ];
