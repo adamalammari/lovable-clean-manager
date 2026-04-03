@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { motion } from "framer-motion";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 
 const recentOrders = [
   { id: "ORD-001", client: "أحمد محمد", service: "تنظيف منزل كامل", date: "2026-03-27", status: "completed" as const, amount: 450 },
@@ -11,6 +12,32 @@ const recentOrders = [
   { id: "ORD-003", client: "خالد الحربي", service: "تنظيف سجاد", date: "2026-03-26", status: "pending" as const, amount: 200 },
   { id: "ORD-004", client: "نورة السالم", service: "تنظيف واجهات", date: "2026-03-26", status: "cancelled" as const, amount: 1200 },
   { id: "ORD-005", client: "فهد العتيبي", service: "تنظيف خزانات", date: "2026-03-25", status: "completed" as const, amount: 350 },
+];
+
+const dailyRevenue = [
+  { day: "السبت", revenue: 3200, orders: 8 },
+  { day: "الأحد", revenue: 4500, orders: 12 },
+  { day: "الإثنين", revenue: 3800, orders: 10 },
+  { day: "الثلاثاء", revenue: 5100, orders: 14 },
+  { day: "الأربعاء", revenue: 4200, orders: 11 },
+  { day: "الخميس", revenue: 6300, orders: 17 },
+  { day: "الجمعة", revenue: 2100, orders: 5 },
+];
+
+const workerPerformance = [
+  { name: "محمد علي", completed: 28, rating: 4.8 },
+  { name: "عبدالله خالد", completed: 24, rating: 4.5 },
+  { name: "يوسف أحمد", completed: 20, rating: 4.7 },
+  { name: "فيصل سعد", completed: 18, rating: 4.3 },
+  { name: "سعود ناصر", completed: 15, rating: 4.6 },
+];
+
+const serviceDistribution = [
+  { name: "تنظيف منازل", value: 35, color: "hsl(var(--primary))" },
+  { name: "تنظيف مكاتب", value: 25, color: "hsl(var(--info))" },
+  { name: "تنظيف سجاد", value: 15, color: "hsl(var(--success))" },
+  { name: "تنظيف واجهات", value: 15, color: "hsl(var(--warning))" },
+  { name: "تنظيف خزانات", value: 10, color: "hsl(var(--destructive))" },
 ];
 
 export default function Dashboard() {
@@ -25,8 +52,104 @@ export default function Dashboard() {
         <StatCard title="نسبة الإنجاز" value="94%" icon={TrendingUp} trend="↑ 2% تحسن" trendUp color="warning" delay={0.3} />
       </div>
 
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">الإيرادات اليومية</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={dailyRevenue}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }}
+                    formatter={(value: number) => [`${value} ر.س`, "الإيرادات"]}
+                  />
+                  <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">أداء العمال (طلبات مكتملة)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={workerPerformance} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" width={90} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }}
+                    formatter={(value: number, name: string) => {
+                      if (name === "completed") return [`${value} طلب`, "مكتمل"];
+                      return [`${value}`, "التقييم"];
+                    }}
+                  />
+                  <Bar dataKey="completed" fill="hsl(var(--info))" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Second charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">توزيع الخدمات</CardTitle>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie data={serviceDistribution} cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                    {serviceDistribution.map((entry, index) => (
+                      <Cell key={index} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="lg:col-span-2">
+          <Card className="border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">عدد الطلبات اليومية</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={dailyRevenue}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }}
+                    formatter={(value: number) => [`${value} طلب`, "الطلبات"]}
+                  />
+                  <Line type="monotone" dataKey="orders" stroke="hsl(var(--success))" strokeWidth={3} dot={{ fill: "hsl(var(--success))", r: 5 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Orders + Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
           <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg">أحدث الطلبات</CardTitle>
@@ -55,7 +178,7 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
           <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg">ملخص اليوم</CardTitle>
