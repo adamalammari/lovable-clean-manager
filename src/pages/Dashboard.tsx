@@ -1,10 +1,10 @@
-import { ClipboardList, Users, DollarSign, TrendingUp, CalendarCheck, XCircle } from "lucide-react";
+import { ClipboardList, Users, DollarSign, TrendingUp, CalendarCheck, XCircle, UserCheck, ReceiptText, Undo2, Star } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
 
 const recentOrders = [
   { id: "ORD-001", client: "أحمد محمد", service: "تنظيف منزل كامل", date: "2026-03-27", status: "completed" as const, amount: 450 },
@@ -40,35 +40,57 @@ const serviceDistribution = [
   { name: "تنظيف خزانات", value: 10, color: "hsl(var(--destructive))" },
 ];
 
+const monthlyTrend = [
+  { month: "يناير", revenue: 42000, clients: 65 },
+  { month: "فبراير", revenue: 38000, clients: 58 },
+  { month: "مارس", revenue: 54200, clients: 82 },
+  { month: "أبريل", revenue: 45000, clients: 71 },
+  { month: "مايو", revenue: 51000, clients: 79 },
+  { month: "يونيو", revenue: 48000, clients: 74 },
+];
+
+const topClients = [
+  { name: "شركة الأفق", orders: 24, total: "18,500 ر.س" },
+  { name: "مؤسسة النور", orders: 18, total: "14,200 ر.س" },
+  { name: "أحمد محمد", orders: 12, total: "8,400 ر.س" },
+  { name: "مجمع الرياض التجاري", orders: 10, total: "12,000 ر.س" },
+];
+
+const tooltipStyle = { backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 };
+
 export default function Dashboard() {
   return (
     <div className="space-y-6">
       <PageHeader title="لوحة التحكم" description="نظرة عامة على أداء الشركة" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {/* Stats Row 1 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="إجمالي الطلبات" value="1,284" icon={ClipboardList} trend="↑ 12% هذا الشهر" trendUp color="primary" delay={0} />
         <StatCard title="العمال النشطون" value="47" icon={Users} trend="3 جدد هذا الأسبوع" trendUp color="info" delay={0.1} />
         <StatCard title="الإيرادات" value="٥٤,٢٠٠ ر.س" icon={DollarSign} trend="↑ 8% عن الشهر السابق" trendUp color="success" delay={0.2} />
         <StatCard title="نسبة الإنجاز" value="94%" icon={TrendingUp} trend="↑ 2% تحسن" trendUp color="warning" delay={0.3} />
       </div>
 
-      {/* Charts Row */}
+      {/* Stats Row 2 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="العملاء" value="312" icon={UserCheck} trend="↑ 15 عميل جديد" trendUp color="primary" delay={0.1} />
+        <StatCard title="الحجوزات المعلقة" value="23" icon={CalendarCheck} trend="5 اليوم" trendUp={false} color="warning" delay={0.15} />
+        <StatCard title="الفواتير" value="٤٥,٨٠٠ ر.س" icon={ReceiptText} trend="12 فاتورة" trendUp color="info" delay={0.2} />
+        <StatCard title="المرتجعات" value="7" icon={Undo2} trend="↓ 3% أقل" trendUp color="destructive" delay={0.25} />
+      </div>
+
+      {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">الإيرادات اليومية</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg">الإيرادات اليومية</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={dailyRevenue}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
                   <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }}
-                    formatter={(value: number) => [`${value} ر.س`, "الإيرادات"]}
-                  />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${value} ر.س`, "الإيرادات"]} />
                   <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -76,39 +98,30 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
           <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">أداء العمال (طلبات مكتملة)</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg">الإيرادات الشهرية والعملاء</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={workerPerformance} layout="vertical">
+                <AreaChart data={monthlyTrend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis type="number" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" width={90} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }}
-                    formatter={(value: number, name: string) => {
-                      if (name === "completed") return [`${value} طلب`, "مكتمل"];
-                      return [`${value}`, "التقييم"];
-                    }}
-                  />
-                  <Bar dataKey="completed" fill="hsl(var(--info))" radius={[0, 6, 6, 0]} />
-                </BarChart>
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [name === "revenue" ? `${value.toLocaleString()} ر.س` : value, name === "revenue" ? "الإيرادات" : "العملاء"]} />
+                  <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" fill="hsl(var(--primary)/0.15)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="clients" stroke="hsl(var(--info))" fill="hsl(var(--info)/0.1)" strokeWidth={2} />
+                </AreaChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
-      {/* Second charts row */}
+      {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">توزيع الخدمات</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg">توزيع الخدمات</CardTitle></CardHeader>
             <CardContent className="flex justify-center">
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -117,28 +130,40 @@ export default function Dashboard() {
                       <Cell key={index} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }} />
+                  <Tooltip contentStyle={tooltipStyle} />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="lg:col-span-2">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
           <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">عدد الطلبات اليومية</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg">أداء العمال</CardTitle></CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={workerPerformance} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" width={90} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [name === "completed" ? `${value} طلب` : value, name === "completed" ? "مكتمل" : "التقييم"]} />
+                  <Bar dataKey="completed" fill="hsl(var(--info))" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+          <Card className="border-0 shadow-sm">
+            <CardHeader><CardTitle className="text-lg">عدد الطلبات اليومية</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={dailyRevenue}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
                   <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }}
-                    formatter={(value: number) => [`${value} طلب`, "الطلبات"]}
-                  />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${value} طلب`, "الطلبات"]} />
                   <Line type="monotone" dataKey="orders" stroke="hsl(var(--success))" strokeWidth={3} dot={{ fill: "hsl(var(--success))", r: 5 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -147,13 +172,11 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Orders + Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+      {/* Bottom section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="lg:col-span-2">
           <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">أحدث الطلبات</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg">أحدث الطلبات</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {recentOrders.map((order) => (
@@ -178,29 +201,51 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-          <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">ملخص اليوم</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { label: "طلبات جديدة", value: "12", icon: ClipboardList, color: "text-primary" },
-                { label: "مواعيد مجدولة", value: "8", icon: CalendarCheck, color: "text-info" },
-                { label: "طلبات مكتملة", value: "15", icon: TrendingUp, color: "text-success" },
-                { label: "إلغاءات", value: "2", icon: XCircle, color: "text-destructive" },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-3">
-                    <item.icon className={`h-5 w-5 ${item.color}`} />
-                    <span className="text-sm">{item.label}</span>
-                  </div>
-                  <span className="text-lg font-bold">{item.value}</span>
+        <div className="space-y-4">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+            <Card className="border-0 shadow-sm">
+              <CardHeader><CardTitle className="text-lg">أفضل العملاء</CardTitle></CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {topClients.map((client, idx) => (
+                    <div key={client.name} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">{idx + 1}</div>
+                        <div>
+                          <p className="text-sm font-medium">{client.name}</p>
+                          <p className="text-xs text-muted-foreground">{client.orders} طلب</p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-semibold">{client.total}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}>
+            <Card className="border-0 shadow-sm">
+              <CardHeader><CardTitle className="text-lg">ملخص اليوم</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                {[
+                  { label: "طلبات جديدة", value: "12", icon: ClipboardList, color: "text-primary" },
+                  { label: "مواعيد مجدولة", value: "8", icon: CalendarCheck, color: "text-info" },
+                  { label: "طلبات مكتملة", value: "15", icon: TrendingUp, color: "text-success" },
+                  { label: "إلغاءات", value: "2", icon: XCircle, color: "text-destructive" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <item.icon className={`h-4 w-4 ${item.color}`} />
+                      <span className="text-sm">{item.label}</span>
+                    </div>
+                    <span className="text-lg font-bold">{item.value}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
