@@ -67,6 +67,7 @@ export default function Orders() {
       const newOrder: Order = { id: `ORD-${String(orders.length + 1).padStart(3, "0")}`, ...form, amount: Number(form.amount) };
       setOrders([newOrder, ...orders]);
       toast({ title: "تمت الإضافة", description: "تم إضافة الطلب بنجاح" });
+      addNotification({ title: "طلب جديد", description: `تم إضافة طلب ${newOrder.id} من ${form.client}`, type: "order" });
     }
     setOpen(false);
   };
