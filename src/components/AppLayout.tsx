@@ -24,6 +24,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   مرحباً، {user.username} ({user.role})
                 </span>
               )}
+              <NotificationBell />
               <Button variant="ghost" size="icon" className="h-9 w-9" onClick={toggleTheme}>
                 {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </Button>
