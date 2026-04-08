@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNotifications } from "@/contexts/NotificationsContext";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const workers = ["محمد علي", "عبدالله خالد", "يوسف أحم�
 const emptyForm = { client: "", phone: "", service: "", date: "", time: "", amount: "", worker: "", status: "pending" as Order["status"] };
 
 export default function Orders() {
+  const { addNotification } = useNotifications();
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -60,10 +62,12 @@ export default function Orders() {
     if (editId) {
       setOrders(orders.map(o => o.id === editId ? { ...o, ...form, amount: Number(form.amount) } : o));
       toast({ title: "تم التحديث", description: "تم تعديل الطلب بنجاح" });
+      addNotification({ title: "تعديل طلب", description: `تم تعديل الطلب ${editId} - ${form.client}`, type: "order" });
     } else {
       const newOrder: Order = { id: `ORD-${String(orders.length + 1).padStart(3, "0")}`, ...form, amount: Number(form.amount) };
       setOrders([newOrder, ...orders]);
       toast({ title: "تمت الإضافة", description: "تم إضافة الطلب بنجاح" });
+      addNotification({ title: "طلب جديد", description: `تم إضافة طلب ${newOrder.id} من ${form.client}`, type: "order" });
     }
     setOpen(false);
   };
